@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ dashboard_title }} · Corporate Expense</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    {% include "_sidebar.html" %}
+    <main class="main-area">
+      <header class="topbar">
+        <div><p class="eyebrow">{{ dashboard_eyebrow }}</p><h1>{{ dashboard_title }}</h1><p class="muted">{{ dashboard_subtitle }}</p></div>
+        <div class="topbar-right">
+          <span class="date-label">{{ today }}</span>
+          {% if session.get('role_key') in ('employee', 'manager') %}<a class="button button-primary" href="{{ url_for('submit_expense') }}">Submit expense</a>{% endif %}
+          {% if session.get('role_key') == 'finance' %}<a class="button button-secondary" href="{{ url_for('export_expenses_csv') }}">Download report</a>{% endif %}
+        </div>
+      </header>
+      {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="alert alert-{{ category }}">{{ message }}</div>{% endfor %}{% endwith %}
+      {% block dashboard_content %}{% endblock %}
+      <footer class="page-footer">Corporate Expense &amp; Reimbursement Management System</footer>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>window.expenseAnalytics = {{ charts|tojson }};</script>
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+</body>
+</html>

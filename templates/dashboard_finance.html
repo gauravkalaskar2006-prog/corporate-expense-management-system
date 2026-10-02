@@ -1,0 +1,24 @@
+{% extends "dashboard_base.html" %}
+{% block dashboard_content %}
+  <section class="stats-grid">
+    <article class="stat-card"><span>All expenses</span><strong>{{ stats.total_count }}</strong><small>{{ stats.total_amount|currency }} total claims</small></article>
+    <article class="stat-card"><span>Pending approval</span><strong>{{ stats.pending_count }}</strong><small>{{ stats.pending_amount|currency }} awaiting manager or Admin review</small></article>
+    <article class="stat-card"><span>Ready to reimburse</span><strong>{{ stats.approved_count }}</strong><small>{{ stats.approved_amount|currency }} approved</small></article>
+    <article class="stat-card"><span>Reimbursed</span><strong>{{ stats.reimbursed_count }}</strong><small>{{ stats.reimbursed_amount|currency }} processed</small></article>
+    <article class="stat-card"><span>Rejected</span><strong>{{ stats.rejected_count }}</strong><small>Claims declined after review</small></article>
+  </section>
+  <section class="panel finance-actions">
+    <div><p class="eyebrow">REIMBURSEMENT QUEUE</p><h2>{{ stats.approved_count }} approved claims to verify</h2><p class="muted">Process payments and monitor completed reimbursements.</p></div>
+    <div class="form-actions"><a class="button button-primary" href="{{ url_for('reimbursements') }}">Open reimbursements</a>{% if session.get('role', '')|lower == 'admin' %}<a class="button button-secondary" href="{{ url_for('manager_approvals') }}">Review manager expenses</a>{% endif %}<a class="button button-secondary" href="{{ url_for('export_expenses_csv') }}">Generate CSV report</a></div>
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><div><h2>Recent organization expenses</h2><p class="muted">Latest claims across all departments.</p></div><a class="text-link" href="{{ url_for('expenses') }}">View all</a></div>
+    {% if recent %}<div class="table-wrap"><table><thead><tr><th>Expense</th><th>Employee</th><th>Department</th><th>Date</th><th>Category</th><th>Amount</th><th>Status</th></tr></thead><tbody>
+      {% for item in recent %}<tr><td>#{{ item.expense_id }}</td><td>{{ item.employee_name }}</td><td>{{ item.department_name }}</td><td>{{ item.expense_date }}</td><td>{{ item.category_name }}</td><td>{{ item.amount|currency }}</td><td><span class="badge badge-{{ item.status|lower }}">{{ item.status }}</span></td></tr>{% endfor %}
+    </tbody></table></div>{% else %}<div class="empty-state"><strong>No expense claims yet</strong><span>Organization claims will appear here.</span></div>{% endif %}
+  </section>
+  <section class="chart-grid dashboard-charts">
+    <article class="panel chart-panel"><div class="panel-heading"><div><h2>Monthly organization expenses</h2><p class="muted">Claim totals this year</p></div></div><div class="chart-box"><canvas id="dashboardMonthlyChart"></canvas></div></article>
+    <article class="panel chart-panel"><div class="panel-heading"><div><h2>Spending by category</h2><p class="muted">Organization totals this year</p></div></div><div class="chart-box"><canvas id="dashboardCategoryChart"></canvas></div></article>
+  </section>
+{% endblock %}

@@ -1,0 +1,32 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Environment variables and secrets
+.env
+
+# VS Code settings
+.vscode/
+
+# Node.js dependencies
+node_modules/
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+
+# Pytest cache
+.pytest_cache/
+
+# Operating system files
+Thumbs.db
+.DS_Store

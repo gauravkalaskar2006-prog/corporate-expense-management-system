@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · Corporate Expense</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="login-page">
+  <main class="login-card">
+    <div class="brand-mark">CE</div>
+    <p class="eyebrow">CORPORATE EXPENSE SYSTEM</p>
+    <h1>Welcome back</h1>
+    <p class="muted">Sign in with your company account.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}<div class="alert alert-{{ category }}">{{ message }}</div>{% endfor %}
+    {% endwith %}
+    <form method="post" action="{{ url_for('login') }}" class="form-stack">
+      <label>Username<input name="username" value="{{ request.form.get('username', '') }}" autocomplete="username" required></label>
+      <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+      <label>Sign in as
+        <select name="role" required>
+          {% for role_key, role_name in login_roles.items() %}
+          <option value="{{ role_key }}" {% if selected_role == role_key %}selected{% endif %}>{{ role_name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <button class="button button-primary button-wide" type="submit">Sign in</button>
+    </form>
+    <p class="login-switch">New to Expense Desk? <a class="text-link" href="{{ url_for('signup') }}">Create an employee account</a></p>
+  </main>
+</body>
+</html>

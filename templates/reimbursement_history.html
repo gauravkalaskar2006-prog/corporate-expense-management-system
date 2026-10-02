@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Reimbursement history · Corporate Expense</title><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
+<body><div class="app-shell">
+  {% include "_sidebar.html" %}
+  <main class="main-area">
+    <header class="topbar"><div><p class="eyebrow">PERSONAL PAYMENTS</p><h1>Reimbursement history</h1><p class="muted">Completed reimbursements for your expense claims.</p></div></header>
+    <section class="panel">
+      {% if history %}<div class="table-wrap"><table><thead><tr><th>Expense</th><th>Expense date</th><th>Category</th><th>Amount</th><th>Paid date</th><th>Status</th><th></th></tr></thead><tbody>
+        {% for item in history %}<tr><td>#{{ item.expense_id }}</td><td>{{ item.expense_date }}</td><td>{{ item.category_name }}</td><td>{{ item.amount|currency }}</td><td>{{ item.reimbursement_date }}</td><td><span class="badge badge-reimbursed">{{ item.reimbursement_status }}</span></td><td><a class="text-link" href="{{ url_for('expense_detail', expense_id=item.expense_id) }}">Details</a></td></tr>{% endfor %}
+      </tbody></table></div>{% else %}<div class="empty-state"><strong>No reimbursements yet</strong><span>Completed payments will appear here.</span></div>{% endif %}
+    </section>
+    <footer class="page-footer">Pending reimbursement status appears in your expense list.</footer>
+  </main>
+</div><script src="{{ url_for('static', filename='js/script.js') }}"></script></body></html>

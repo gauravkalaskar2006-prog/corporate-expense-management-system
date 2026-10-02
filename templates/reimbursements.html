@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Reimbursements · Corporate Expense</title><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
+<body><div class="app-shell">
+  {% include "_sidebar.html" %}
+  <main class="main-area">
+    <header class="topbar"><div><p class="eyebrow">ADMIN REIMBURSEMENT</p><h1>Reimbursements</h1><p class="muted">Approved claims appear here for Admin to verify and process.</p></div></header>
+    {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="alert alert-{{ category }}">{{ message }}</div>{% endfor %}{% endwith %}
+    <section class="panel"><div class="panel-heading"><div><h2>Approved claims</h2><p class="muted">Verify an approved claim and record its reimbursement.</p></div></div>
+      {% if approved_expenses %}<div class="table-wrap"><table><thead><tr><th>Expense</th><th>Employee</th><th>Department</th><th>Category</th><th>Date</th><th>Amount</th><th>Action</th></tr></thead><tbody>
+        {% for item in approved_expenses %}<tr><td>#{{ item.expense_id }}</td><td>{{ item.employee_name }}</td><td>{{ item.department_name }}</td><td>{{ item.category_name }}</td><td>{{ item.expense_date }}</td><td>{{ item.amount|currency }}</td><td><form method="post" action="{{ url_for('process_reimbursement', expense_id=item.expense_id) }}" onsubmit="return confirm('Mark expense #{{ item.expense_id }} as reimbursed?')"><button class="button button-small button-primary" type="submit">Verify and process</button></form></td></tr>{% endfor %}
+      </tbody></table></div>{% else %}<div class="empty-state"><strong>No approved claims to process</strong><span>Employee claims approved by managers and manager claims approved by Admin will appear here.</span></div>{% endif %}
+    </section>
+    <section class="panel"><div class="panel-heading"><div><h2>Processed reimbursements</h2><p class="muted">Recently completed payments</p></div></div>
+      {% if processed_reimbursements %}<div class="table-wrap"><table><thead><tr><th>Expense</th><th>Employee</th><th>Amount</th><th>Processed date</th><th>Status</th></tr></thead><tbody>
+        {% for item in processed_reimbursements %}<tr><td>#{{ item.expense_id }}</td><td>{{ item.employee_name }}</td><td>{{ item.amount|currency }}</td><td>{{ item.reimbursement_date }}</td><td><span class="badge badge-reimbursed">{{ item.status or "Processed" }}</span></td></tr>{% endfor %}
+      </tbody></table></div>{% else %}<div class="empty-state compact"><span>No reimbursement records yet.</span></div>{% endif %}
+    </section>
+    <footer class="page-footer">Processing a claim updates its expense and reimbursement records in one transaction.</footer>
+  </main>
+</div><script src="{{ url_for('static', filename='js/script.js') }}"></script></body></html>

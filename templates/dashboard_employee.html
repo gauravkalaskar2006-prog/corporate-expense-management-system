@@ -1,0 +1,20 @@
+{% extends "dashboard_base.html" %}
+{% block dashboard_content %}
+  <section class="stats-grid">
+    <article class="stat-card"><span>My expenses</span><strong>{{ stats.total_count }}</strong><small>{{ stats.total_amount|currency }} submitted</small></article>
+    <article class="stat-card"><span>Pending</span><strong>{{ stats.pending_count }}</strong><small>{{ stats.pending_amount|currency }} awaiting review</small></article>
+    <article class="stat-card"><span>Approved</span><strong>{{ stats.approved_count }}</strong><small>{{ stats.approved_amount|currency }} ready for finance</small></article>
+    <article class="stat-card"><span>Rejected</span><strong>{{ stats.rejected_count }}</strong><small>See remarks in each claim</small></article>
+    <article class="stat-card"><span>Reimbursed</span><strong>{{ stats.reimbursed_count }}</strong><small>{{ stats.reimbursed_amount|currency }} paid</small></article>
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><div><h2>My recent expenses</h2><p class="muted">Track each claim and its reimbursement status.</p></div><a class="text-link" href="{{ url_for('expenses') }}">View all</a></div>
+    {% if recent %}<div class="table-wrap"><table><thead><tr><th>Expense</th><th>Date</th><th>Category</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody>
+      {% for item in recent %}<tr><td>#{{ item.expense_id }}</td><td>{{ item.expense_date }}</td><td>{{ item.category_name }}</td><td>{{ item.amount|currency }}</td><td><span class="badge badge-{{ item.status|lower }}">{{ item.status }}</span></td><td><a class="text-link" href="{{ url_for('expense_detail', expense_id=item.expense_id) }}">Details</a></td></tr>{% endfor %}
+    </tbody></table></div>{% else %}<div class="empty-state"><strong>No expense claims yet</strong><span>Submit an expense to start tracking its review and reimbursement.</span></div>{% endif %}
+  </section>
+  <section class="chart-grid dashboard-charts">
+    <article class="panel chart-panel"><div class="panel-heading"><div><h2>Monthly spending</h2><p class="muted">Your submitted claims this year</p></div></div><div class="chart-box"><canvas id="dashboardMonthlyChart"></canvas></div></article>
+    <article class="panel chart-panel"><div class="panel-heading"><div><h2>Spending by category</h2><p class="muted">Your claim totals this year</p></div></div><div class="chart-box"><canvas id="dashboardCategoryChart"></canvas></div></article>
+  </section>
+{% endblock %}

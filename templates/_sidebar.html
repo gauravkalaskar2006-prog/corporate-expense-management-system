@@ -1,0 +1,28 @@
+<aside class="sidebar">
+  <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark">CE</span><span>Expense Desk<small>Corporate portal</small></span></a>
+  <nav class="side-nav">
+    <a class="{% if active_page|default('') == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">Dashboard</a>
+    {% if session.get('role_key') == 'employee' %}
+      <a class="{% if active_page|default('') == 'profile' %}active{% endif %}" href="{{ url_for('profile') }}">My profile</a>
+      <a class="{% if active_page|default('') == 'expenses' %}active{% endif %}" href="{{ url_for('expenses') }}">My expenses</a>
+      <a class="{% if active_page|default('') == 'submit_expense' %}active{% endif %}" href="{{ url_for('submit_expense') }}">Submit expense</a>
+      <a class="{% if active_page|default('') == 'my_reimbursements' %}active{% endif %}" href="{{ url_for('my_reimbursements') }}">Reimbursement history</a>
+      <a class="{% if active_page|default('') == 'analytics' %}active{% endif %}" href="{{ url_for('analytics') }}">Personal analytics</a>
+    {% elif session.get('role_key') == 'manager' %}
+      <a class="{% if active_page|default('') == 'profile' %}active{% endif %}" href="{{ url_for('profile') }}">My profile</a>
+      <a class="{% if active_page|default('') == 'my_expenses' %}active{% endif %}" href="{{ url_for('my_expenses') }}">My expenses</a>
+      <a class="{% if active_page|default('') == 'submit_expense' %}active{% endif %}" href="{{ url_for('submit_expense') }}">Submit expense</a>
+      <a class="{% if active_page|default('') == 'my_reimbursements' %}active{% endif %}" href="{{ url_for('my_reimbursements') }}">Reimbursement history</a>
+      <a class="{% if active_page|default('') == 'my_analytics' %}active{% endif %}" href="{{ url_for('my_analytics') }}">Personal analytics</a>
+      <a class="{% if active_page|default('') == 'expenses' %}active{% endif %}" href="{{ url_for('expenses') }}">Department expenses</a>
+      <a class="{% if active_page|default('') == 'analytics' %}active{% endif %}" href="{{ url_for('analytics') }}">Department analytics</a>
+    {% else %}
+      <a class="{% if active_page|default('') == 'expenses' %}active{% endif %}" href="{{ url_for('expenses') }}">All expenses</a>
+      {% if session.get('role', '')|lower == 'admin' %}<a class="{% if active_page|default('') == 'manager_approvals' %}active{% endif %}" href="{{ url_for('manager_approvals') }}">Manager approvals</a>{% endif %}
+      <a class="{% if active_page|default('') == 'reimbursements' %}active{% endif %}" href="{{ url_for('reimbursements') }}">Reimbursements</a>
+      <a class="{% if active_page|default('') == 'analytics' %}active{% endif %}" href="{{ url_for('analytics') }}">Financial analytics</a>
+      <a href="{{ url_for('export_expenses_csv') }}">Generate report</a>
+    {% endif %}
+  </nav>
+  <div class="sidebar-bottom"><span class="user-dot">{{ session.get('username', 'U')[:1]|upper }}</span><span>{{ session.get('username') }}<small>{{ session.get('role') }}</small></span><a class="signout" href="{{ url_for('logout') }}">Sign out</a></div>
+</aside>

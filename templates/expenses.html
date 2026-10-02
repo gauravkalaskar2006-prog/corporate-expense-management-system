@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Expenses · Corporate Expense</title><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
+<body><div class="app-shell">
+  {% include "_sidebar.html" %}
+  <main class="main-area">
+    <header class="topbar">
+      <div><p class="eyebrow">{% if manager_review %}DEPARTMENT REQUESTS{% elif session.get('role_key') == 'finance' %}ORGANIZATION RECORDS{% else %}PERSONAL RECORDS{% endif %}</p><h1>{% if manager_review %}Department expenses{% elif session.get('role_key') == 'finance' %}All expenses{% else %}My expenses{% endif %}</h1><p class="muted">{% if manager_review %}Pending employee claims awaiting your decision.{% else %}Search and review expense claims.{% endif %}</p></div>
+      {% if session.get('role_key') in ('employee', 'manager') and not manager_review %}<a class="button button-primary" href="{{ url_for('submit_expense') }}">Submit expense</a>{% endif %}
+    </header>
+    {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="alert alert-{{ category }}">{{ message }}</div>{% endfor %}{% endwith %}
+    <section class="panel">
+      <form class="filter-bar" method="get" action="{{ url_for(listing_endpoint) }}">
+        <label class="search-field">Search<input type="search" name="q" value="{{ search }}" placeholder="Description, category, employee"></label>
+        {% if not manager_review %}<label>Status<select name="status"><option value="">All statuses</option>{% for value in statuses %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ value }}</option>{% endfor %}</select></label>{% endif %}
+        <button class="button button-secondary" type="submit">Apply filters</button>
+        {% if search or selected_status %}<a class="text-link" href="{{ url_for(listing_endpoint) }}">Clear</a>{% endif %}
+      </form>
+      {% if expenses %}<div class="table-wrap"><table class="sortable-table"><thead><tr><th>ID</th><th>Date</th>{% if session.get('role_key') != 'employee' %}<th>Employee / department</th>{% endif %}<th>Category</th><th>Description</th><th>Payment</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+        {% for item in expenses %}<tr>
+          <td>#{{ item.expense_id }}</td><td>{{ item.expense_date }}</td>
+          {% if session.get('role_key') != 'employee' %}<td>{{ item.employee_name }}<small class="cell-sub">{{ item.department_name }}</small></td>{% endif %}
+          <td>{{ item.category_name }}</td><td>{{ item.description }}</td><td>{{ item.payment_method }}</td><td>{{ item.amount|currency }}</td>
+          <td><span class="badge badge-{{ item.status|lower }}">{{ item.status }}</span></td>
+          <td><a class="text-link" href="{{ url_for('expense_detail', expense_id=item.expense_id, source=listing_endpoint) }}">View</a>{% if manager_review and item.status == 'Pending' %}<form class="decision-form" method="post" action="{{ url_for('decide_expense', expense_id=item.expense_id) }}"><input name="remarks" maxlength="500" placeholder="Remarks (required to reject)" aria-label="Remarks for expense {{ item.expense_id }}"><button class="button button-small button-success" name="decision" value="Approved" type="submit">Approve</button><button class="button button-small button-danger" name="decision" value="Rejected" type="submit">Reject</button></form>{% elif session.get('role_key') in ('employee', 'manager') and item.employee_id == session.get('employee_id') and item.status in ('Pending', 'Pending Admin') %}<form class="inline-form" method="post" action="{{ url_for('delete_expense', expense_id=item.expense_id) }}" data-confirm="Cancel this pending expense?"><button class="text-button text-danger" type="submit">Cancel</button></form>{% endif %}</td>
+        </tr>{% endfor %}
+      </tbody></table></div>{% else %}<div class="empty-state"><strong>{% if manager_review %}No pending employee requests{% else %}No matching expenses{% endif %}</strong><span>{% if manager_review %}New employee claims from your department will appear here for approval or rejection.{% else %}Try changing your search or status filter.{% endif %}</span></div>{% endif %}
+    </section>
+    <footer class="page-footer">Expense details include receipt information and approval remarks.</footer>
+  </main>
+</div><script src="{{ url_for('static', filename='js/script.js') }}"></script><script src="{{ url_for('static', filename='js/expenses.js') }}"></script></body></html>

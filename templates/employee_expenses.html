@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Employee expenses · Corporate Expense</title><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
+<body><div class="app-shell">
+  {% include "_sidebar.html" %}
+  <main class="main-area">
+    <header class="topbar"><div><p class="eyebrow">MANAGER REVIEW</p><h1>Employee expenses</h1><p class="muted">Review every employee claim in your department and act on pending requests.</p></div></header>
+    {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="alert alert-{{ category }}">{{ message }}</div>{% endfor %}{% endwith %}
+    <section class="panel">
+      <div class="panel-heading"><div><h2>Department employee requests</h2><p class="muted">{{ employee_expenses|length }} claims shown · {{ pending_count }} awaiting your decision</p></div></div>
+      <form class="filter-bar" method="get" action="{{ url_for('employee_expenses') }}">
+        <label>Status<select name="status"><option value="">All statuses</option>{% for value in statuses %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ value }}</option>{% endfor %}</select></label>
+        <button class="button button-secondary" type="submit">Apply filter</button>
+        {% if selected_status %}<a class="text-link" href="{{ url_for('employee_expenses') }}">Clear</a>{% endif %}
+      </form>
+      {% if employee_expenses %}<div class="table-wrap"><table><thead><tr><th>Expense</th><th>Employee</th><th>Date</th><th>Category</th><th>Description</th><th>Receipt</th><th>Amount</th><th>Status</th><th>Decision</th></tr></thead><tbody>
+        {% for item in employee_expenses %}<tr>
+          <td><a class="text-link" href="{{ url_for('expense_detail', expense_id=item.expense_id) }}">#{{ item.expense_id }}</a></td>
+          <td>{{ item.employee_name }}<small class="cell-sub">{{ item.department_name }}</small></td>
+          <td>{{ item.expense_date }}</td><td>{{ item.category_name }}</td><td>{{ item.description }}</td>
+          <td>{% if item.receipt_reference %}{{ item.receipt_reference }}{% endif %}{% if item.receipt_file %}<a class="text-link cell-sub" href="{{ url_for('download_receipt', expense_id=item.expense_id) }}">Download receipt</a>{% endif %}{% if not item.receipt_reference and not item.receipt_file %}—{% endif %}</td>
+          <td>{{ item.amount|currency }}</td><td><span class="badge badge-{{ item.status|lower }}">{{ item.status }}</span></td>
+          <td>{% if item.status == 'Pending' %}<form class="decision-form" method="post" action="{{ url_for('decide_expense', expense_id=item.expense_id) }}"><input type="hidden" name="return_to" value="employee_expenses"><input type="hidden" name="return_status" value="{{ selected_status }}"><input name="remarks" maxlength="500" placeholder="Remarks (required to reject)" aria-label="Remarks for expense {{ item.expense_id }}"><button class="button button-small button-success" name="decision" value="Approved" type="submit">Approve</button><button class="button button-small button-danger" name="decision" value="Rejected" type="submit">Reject</button></form>{% else %}<span class="muted">Reviewed</span>{% endif %}</td>
+        </tr>{% endfor %}
+      </tbody></table></div>{% else %}<div class="empty-state"><strong>No employee expense requests</strong><span>Claims submitted by employees in your department will appear here.</span></div>{% endif %}
+    </section>
+    <footer class="page-footer">Approved employee claims move to Admin for reimbursement. Rejected claims remain listed here.</footer>
+  </main>
+</div><script src="{{ url_for('static', filename='js/script.js') }}"></script></body></html>

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ analytics_title }} · Corporate Expense</title><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
+<body><div class="app-shell">
+  {% include "_sidebar.html" %}
+  <main class="main-area">
+    <header class="topbar"><div><p class="eyebrow">REPORTING</p><h1>{{ analytics_title }}</h1><p class="muted">Expense totals and breakdowns from the database.</p></div><form method="get" class="year-filter"><label for="year">Year</label><select name="year" id="year" onchange="this.form.submit()">{% for option in available_years %}<option value="{{ option }}" {% if option == selected_year %}selected{% endif %}>{{ option }}</option>{% endfor %}</select></form></header>
+    <section class="stats-grid analytics-stats">
+      <article class="stat-card"><span>Total expenses</span><strong>{{ summary.total_count }}</strong><small>{{ summary.total_amount|currency }} total</small></article>
+      <article class="stat-card"><span>Average expense</span><strong>{{ summary.average_amount|currency }}</strong><small>Across recorded claims</small></article>
+      <article class="stat-card"><span>Highest expense</span><strong>{{ summary.highest_amount|currency }}</strong><small>Single claim</small></article>
+      <article class="stat-card"><span>Lowest expense</span><strong>{{ summary.lowest_amount|currency }}</strong><small>Single claim</small></article>
+      <article class="stat-card"><span>Total reimbursed</span><strong>{{ summary.reimbursed_amount|currency }}</strong><small>Completed payments</small></article>
+      <article class="stat-card"><span>Pending amount</span><strong>{{ summary.pending_amount|currency }}</strong><small>Awaiting approval</small></article>
+    </section>
+    <section class="chart-grid">
+      <article class="panel chart-panel"><div class="panel-heading"><div><h2>Monthly expenses</h2><p class="muted">Claim totals by month</p></div></div><div class="chart-box"><canvas id="monthlyChart"></canvas></div></article>
+      <article class="panel chart-panel"><div class="panel-heading"><div><h2>Expense statuses</h2><p class="muted">Current status distribution</p></div></div><div class="chart-box chart-box-small"><canvas id="statusChart"></canvas></div></article>
+      <article class="panel chart-panel"><div class="panel-heading"><div><h2>By category</h2><p class="muted">Claim totals per category</p></div></div><div class="chart-box"><canvas id="categoryChart"></canvas></div></article>
+      <article class="panel chart-panel"><div class="panel-heading"><div><h2>By department</h2><p class="muted">Claim totals per department</p></div></div><div class="chart-box"><canvas id="departmentChart"></canvas></div></article>
+    </section>
+    <footer class="page-footer">Figures are calculated from stored expense and reimbursement records.</footer>
+  </main>
+</div><script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script>window.expenseAnalytics = {{ charts|tojson }};</script><script src="{{ url_for('static', filename='js/script.js') }}"></script><script src="{{ url_for('static', filename='js/analytics.js') }}"></script></body></html>

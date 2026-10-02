@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Create account · Corporate Expense</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="login-page">
+  <main class="login-card signup-card">
+    <a class="brand-mark" href="{{ url_for('login') }}" aria-label="Expense Desk">CE</a>
+    <p class="eyebrow">CORPORATE EXPENSE SYSTEM</p>
+    <h1>Create your account</h1>
+    <p class="muted">Register as an employee to submit and track expense claims.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}<div class="alert alert-{{ category }}">{{ message }}</div>{% endfor %}
+    {% endwith %}
+    <form method="post" action="{{ url_for('signup') }}" class="signup-grid">
+      <label>First name<input name="first_name" value="{{ form.get('first_name', '') }}" autocomplete="given-name" maxlength="80" required></label>
+      <label>Last name<input name="last_name" value="{{ form.get('last_name', '') }}" autocomplete="family-name" maxlength="80" required></label>
+      <label>Username<input name="username" value="{{ form.get('username', '') }}" autocomplete="username" minlength="3" maxlength="50" required></label>
+      <label>Mobile number<input name="mobile" value="{{ form.get('mobile', '') }}" type="tel" autocomplete="tel" maxlength="20" required></label>
+      <label>Gender
+        <select name="gender" required>
+          <option value="">Choose an option</option>
+          {% for value in gender_options %}
+          <option value="{{ value }}" {% if form.get('gender') == value %}selected{% endif %}>{{ value }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Email address<input name="email" value="{{ form.get('email', '') }}" type="email" autocomplete="email" maxlength="254" required></label>
+      {% if departments %}
+      <label class="span-2">Department
+        <select name="department_id" required>
+          <option value="" {% if not form.get('department_id') %}selected{% endif %} disabled>Choose your department</option>
+          {% for department in departments %}
+          <option value="{{ department.department_id }}" {% if form.get('department_id') == department.department_id|string %}selected{% endif %}>{{ department.department_name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      {% endif %}
+      <label>Password<input name="password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required></label>
+      <label>Confirm password<input name="confirm_password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required></label>
+      <button class="button button-primary button-wide span-2" type="submit">Create account</button>
+    </form>
+    <p class="role-note">Manager and Finance/Admin accounts are created by your organization administrator.</p>
+    <p class="login-switch">Already have an account? <a class="text-link" href="{{ url_for('login') }}">Sign in</a></p>
+  </main>
+</body>
+</html>

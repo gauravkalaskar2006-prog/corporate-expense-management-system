@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Expense #{{ expense.expense_id }} · Corporate Expense</title><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
+<body><div class="app-shell">
+  {% include "_sidebar.html" %}
+  <main class="main-area">
+    <header class="topbar"><div><p class="eyebrow">EXPENSE DETAILS</p><h1>Expense #{{ expense.expense_id }}</h1><p class="muted">Review the receipt information and current reimbursement status.</p></div><a class="button button-secondary" href="{{ url_for(back_endpoint) }}">Back to expenses</a></header>
+    <section class="panel detail-panel"><div class="detail-status"><span class="badge badge-{{ expense.status|lower }}">{{ expense.status }}</span></div><dl class="detail-grid">
+      <div><dt>Employee</dt><dd>{{ expense.employee_name }}</dd></div><div><dt>Department</dt><dd>{{ expense.department_name }}</dd></div>
+      <div><dt>Category</dt><dd>{{ expense.category_name }}</dd></div><div><dt>Expense date</dt><dd>{{ expense.expense_date }}</dd></div>
+      <div><dt>Amount</dt><dd>{{ expense.amount|currency }}</dd></div><div><dt>Payment method</dt><dd>{{ expense.payment_method }}</dd></div>
+      <div class="detail-wide"><dt>Description</dt><dd>{{ expense.description }}</dd></div>
+      <div class="detail-wide"><dt>Receipt information</dt><dd>{{ expense.receipt_reference or "No receipt information provided" }}{% if expense.receipt_file %}<span class="cell-sub"><a class="text-link" href="{{ url_for('download_receipt', expense_id=expense.expense_id) }}">Download uploaded receipt</a></span>{% endif %}</dd></div>
+      {% if expense.approval_remarks %}<div class="detail-wide"><dt>Latest approval remarks</dt><dd>{{ expense.approval_remarks }}</dd></div>{% endif %}
+      {% if expense.reimbursement_date %}<div><dt>Reimbursed on</dt><dd>{{ expense.reimbursement_date }}</dd></div>{% endif %}
+    </dl></section>
+    <footer class="page-footer">Expense details are visible according to your role and department.</footer>
+  </main>
+</div><script src="{{ url_for('static', filename='js/script.js') }}"></script></body></html>

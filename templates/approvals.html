@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Approvals · Corporate Expense</title><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
+<body><div class="app-shell">
+  {% include "_sidebar.html" %}
+  <main class="main-area">
+    <header class="topbar"><div><p class="eyebrow">{{ approval_eyebrow }}</p><h1>{{ approval_title }}</h1><p class="muted">{{ approval_subtitle }}</p></div></header>
+    {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="alert alert-{{ category }}">{{ message }}</div>{% endfor %}{% endwith %}
+    <section class="panel"><div class="panel-heading"><div><h2>Employee claims awaiting your decision</h2><p class="muted">{{ pending_expenses|length }} claims waiting for a decision. Approved claims move to Admin for reimbursement.</p></div></div>
+      {% if pending_expenses %}<div class="table-wrap"><table><thead><tr><th>Expense</th><th>Employee</th><th>Department</th><th>Category</th><th>Date</th><th>Description</th><th>Receipt</th><th>Amount</th><th>Decision</th></tr></thead><tbody>
+        {% for item in pending_expenses %}<tr><td><a class="text-link" href="{{ url_for('expense_detail', expense_id=item.expense_id) }}">#{{ item.expense_id }}</a></td><td>{{ item.employee_name }}</td><td>{{ item.department_name }}</td><td>{{ item.category_name }}</td><td>{{ item.expense_date }}</td><td>{{ item.description }}</td><td>{% if item.receipt_reference %}{{ item.receipt_reference }}{% endif %}{% if item.receipt_file %}<a class="text-link cell-sub" href="{{ url_for('download_receipt', expense_id=item.expense_id) }}">Download receipt</a>{% endif %}{% if not item.receipt_reference and not item.receipt_file %}—{% endif %}</td><td>{{ item.amount|currency }}</td><td><form class="decision-form" method="post" action="{{ url_for('decide_expense', expense_id=item.expense_id) }}"><input name="remarks" maxlength="500" placeholder="Remarks (required to reject)" aria-label="Remarks for expense {{ item.expense_id }}"><button class="button button-small button-success" name="decision" value="Approved" type="submit">Approve</button><button class="button button-small button-danger" name="decision" value="Rejected" type="submit">Reject</button></form></td></tr>{% endfor %}
+      </tbody></table></div>{% else %}<div class="empty-state"><strong>All caught up</strong><span>There are no pending claims to review.</span></div>{% endif %}
+    </section><footer class="page-footer">Each decision and its remarks are saved to the approval history.</footer>
+  </main>
+</div><script src="{{ url_for('static', filename='js/script.js') }}"></script></body></html>
